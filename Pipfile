@@ -9,6 +9,8 @@ Flask = "*"
 Flask-SQLAlchemy = "*"
 Flask-Cors = "*"
 Flask-Bcrypt = "*"
+bcrypt = "*"
+sqlalchemy-utils = "*"
 
 [dev-packages]
 
