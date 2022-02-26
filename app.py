@@ -117,11 +117,13 @@ def add_transaction():
         return jsonify('Error: Data must be JSON' )
 
     post_data = request.get_json()
-    date = post_data.get("data")
+    date = post_data.get("date")
     description = post_data.get("description")
     type = post_data.get("type")
     category = post_data.get("category")
     amount = post_data.get("amount")
+
+    
 
     new_transaction = Transaction(date, description, type, category, amount)
     
@@ -132,11 +134,14 @@ def add_transaction():
 
 @app.route("/transactions/get", methods=["GET"])
 def get_all_transactions():
-    pass
+    all_transactions = db.session.query(Transaction).all()
+    return jsonify(multiple_transaction_schema.dump(all_transactions))
 
 @app.route("/transactions/get/<type>", methods=["GET"])
 def get_transaction_by_type():
-    pass
+    transaction = db.session.query(Transaction).filter(Transaction.type == type).first()
+
+    return jsonify(multiple_transaction_schema.dump(transaction))
 
 if __name__ == '__main__':
     app.run(debug=True)
