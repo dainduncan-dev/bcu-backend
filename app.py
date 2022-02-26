@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify
 from flask_bcrypt import Bcrypt, generate_password_hash, check_password_hash
 from flask_cors import CORS
 from flask_marshmallow import Marshmallow
-from flask_sqlalchemy import SQLAlchemy, DateTime
+from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 import os
 
@@ -29,7 +29,7 @@ class User(db.Model):
 
 class Transaction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    date = db.Column(DateTime, default=datetime.now)
+    date = db.Column(db.String(12), nullable=True)
     description = db.Column(db.String(50), nullable=False)
     type = db.Column(db.String, nullable=False)
     category = db.Column(db.String, nullable=False)
@@ -49,7 +49,7 @@ class UserSchema(ma.Schema):
 
 class TransactionSchema(ma.Schema):
     class Meta:
-        fields = ("date", "description", "type", "category", "amount")
+        fields = ("id", "date","description", "type", "category", "amount")
 
 user_schema = UserSchema()
 multiple_user_schema = UserSchema(many=True)
@@ -105,7 +105,7 @@ def get_all_users():
     all_users = db.session.query(User).all()
     return jsonify(multiple_user_schema.dump(all_users))
 
-@app.route("/user/get/email", methods=["GET"])
+@app.route("/user/get/<email>", methods=["GET"])
 def get_user_by_email():
     user = db.session.query(User).filter(User.email == email).first()
 
@@ -117,13 +117,13 @@ def add_transaction():
         return jsonify('Error: Data must be JSON' )
 
     post_data = request.get_json()
-    date = post_data.get("date")
+    date = post_data.get("data")
     description = post_data.get("description")
     type = post_data.get("type")
     category = post_data.get("category")
     amount = post_data.get("amount")
 
-    new_transaction = User(date, description, type, category, amount)
+    new_transaction = Transaction(date, description, type, category, amount)
     
     db.session.add(new_transaction)
     db.session.commit()
